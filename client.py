@@ -9,12 +9,17 @@ async def hello():
     uri = "ws://127.0.0.1:8765"
     port = 8769
     async with connect(uri) as websocket:
-        name = input("What's your name? ")
+        #name = input("What's your name? ")
 
-        await websocket.send(name)
-        print(f">>> {name}")
+        #await websocket.send(name)
+        #print(f">>> {name}")
 
-        greeting = await websocket.recv()
-        print(f"<<< {greeting}")
-
+        #greeting = await websocket.recv()
+        #print(f"<<< {greeting}")
+        while(True):
+            message = input(":: ")
+            print(message)
+            await websocket.send(message)
+            returned = await websocket.recv()
+            print(returned)
 asyncio.run(hello())
