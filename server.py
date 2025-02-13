@@ -23,7 +23,7 @@ async def hello(websocket):
     #print(f">>> {greeting}")
     while(1): #creates a while loop that constantly waits for messages, and sends them as of now 
           name = await websocket.recv()
-          print("them:: "+name)
+          print(name)
         
           #greeting = input("me::  ")
 
