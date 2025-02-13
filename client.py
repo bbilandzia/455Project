@@ -17,9 +17,9 @@ async def hello():
         #greeting = await websocket.recv()
         #print(f"<<< {greeting}")
         while(True):
-            message = input(":: ")
-            print(message)
+            message = input("Me:: ")
+            #print(message)
             await websocket.send(message)
             returned = await websocket.recv()
-            print(returned)
+            print("Them::  "+returned)
 asyncio.run(hello())

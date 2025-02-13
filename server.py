@@ -21,12 +21,12 @@ async def hello(websocket):
     #print(f">>> {greeting}")
     while(1):
           name = await websocket.recv()
-          print(f"<<< {name}")
+          print("them:: "+name)
 
-          greeting = f"Hello {name}!"
+          greeting = input("me::  ")
 
           await websocket.send(greeting)
-          print(f">>> {greeting}")  
+          #print("them:: {greeting}")  
 async def main():
     print("main")
     async with serve(hello, "localhost", 8765):
