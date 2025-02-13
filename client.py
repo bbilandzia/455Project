@@ -19,13 +19,14 @@ async def hello():
 
         #await websocket.send(name)
         #print(f">>> {name}")
-
+        user = input("Enter Name: ")
         #greeting = await websocket.recv()
         #print(f"<<< {greeting}")
         while(True):
             message = input("Me:: ")
             #print(message)
-            await websocket.send(message)
+            await websocket.send(user+ " : "+ message)
+            
             returned = await websocket.recv()
             print("Them::  "+returned)
 

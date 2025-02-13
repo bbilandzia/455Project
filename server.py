@@ -21,13 +21,13 @@ async def hello(websocket):
 
     #await websocket.send(greeting)
     #print(f">>> {greeting}")
-    while(1):
+    while(1): #creates a while loop that constantly waits for messages, and sends them as of now 
           name = await websocket.recv()
           print("them:: "+name)
+        
+          #greeting = input("me::  ")
 
-          greeting = input("me::  ")
-
-          await websocket.send(greeting)
+          #await websocket.send(greeting)
           #print("them:: {greeting}")  
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 localhostpem= pathlib.Path(__file__).with_name("localhost.pem")
@@ -35,9 +35,9 @@ ssl_context.load_cert_chain(localhostpem)
 
 async def main():
     print("main")
-    async with serve(hello, "localhost", 8765, ssl=ssl_context):
+    async with serve(hello, "localhost", 8765, ssl=ssl_context): #this creates the server on the localhost on port 8765 and uses SSL_context for the ssl 
         print("inside main")
-        await asyncio.get_running_loop().create_future()  # run forever
+        await asyncio.get_running_loop().create_future()  # this makes it so it runs forever
         print("does this work")
 
 if __name__ == "__main__":
