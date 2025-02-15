@@ -31,6 +31,7 @@ async def connect_to_server():
             print("\nLogin failed - wrong username or password.")
             await connection.close()
             return None, None
+
     except Exception as e:
         print(f"Error: {e}")
         return None, None
@@ -55,16 +56,17 @@ async def receive(websocket, user):
 
 async def main():
     connection, username = await connect_to_server()
+    if connection is None:
+        print("Connection failed. Exiting program...")
+        return
     rectask = asyncio.create_task(receive(connection, username))
 
     try:
-       # sendtask = asyncio.create_task(send(websocket,user)) This isn't working atm but I can get 2 clients connected now so that's cool
         await send(connection, username)
     finally:
         rectask.cancel()
         await connection.close()
-    #await asyncio.wait([sendtask,rectask],return_when=asyncio.FIRST_COMPLETED)
-
+        
 if __name__ == "__main__":
     try:
         asyncio.run(main())
