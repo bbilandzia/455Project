@@ -4,8 +4,34 @@ from tkinter import *
 class ChatApp:
     def __init__(self, root):
         self.root = root
-        
-       
+
+
+        self.root.withdraw()
+        #create login window
+        self.login = Toplevel()
+        #set title of login window
+        self.login.title("Login Window")
+        #self.login.resizable(width = False, height = False) 
+        self.login.configure(width = 400, height = 300)
+
+        #self.pls = Label(self.login, text = "Please login to continue", justify = CENTER,font = ('Arial',14))
+        #create and username laebl
+        username_label = tk.Label(self.login,text = "Username:")
+        username_label.pack()
+        #create field to put username
+        username_entry = tk.Entry(self.login)
+        username_entry.pack()
+        #create and pack password label
+        password_label = tk.Label(self.login,text = "Password:")
+        password_label.pack()
+        #create and place the password label and entry
+        password_entry = tk.Entry(self.login)
+        password_entry.pack()
+
+
+
+
+
 
 
 
