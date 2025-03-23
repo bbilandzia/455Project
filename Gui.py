@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 import tkinter as tk
 from tkinter import scrolledtext, ttk
 from tkinter import *
@@ -8,7 +9,7 @@ class ChatApp:
 
         self.root.withdraw()
         #create login window
-        self.login = Toplevel()
+        self.login = tk.Toplevel()
         #set title of login window
         self.login.title("Login Window")
         #self.login.resizable(width = False, height = False) 
@@ -16,19 +17,21 @@ class ChatApp:
 
         #self.pls = Label(self.login, text = "Please login to continue", justify = CENTER,font = ('Arial',14))
         #create and username laebl
-        username_label = tk.Label(self.login,text = "Username:")
-        username_label.pack()
+        self.username_label = tk.Label(self.login,text = "Username:")
+        self.username_label.pack()
         #create field to put username
-        username_entry = tk.Entry(self.login)
-        username_entry.pack()
+        self.username_entry = tk.Entry(self.login)
+        self.username_entry.pack()
         #create and pack password label
-        password_label = tk.Label(self.login,text = "Password:")
-        password_label.pack()
+        self.password_label = tk.Label(self.login,text = "Password:")
+        self.password_label.pack()
         #create and place the password label and entry
-        password_entry = tk.Entry(self.login)
-        password_entry.pack()
+        self.password_entry = tk.Entry(self.login)
+        self.password_entry.pack()
+        
 
-
+        self.loginbutton = tk.Button(self.login, text = "ATTEMPT", font = ('Arial', 14), command = self.close_login_menu)
+        self.loginbutton.pack()
 
 
 
@@ -47,7 +50,18 @@ class ChatApp:
         self.root.grid_rowconfigure(0, weight=1)
         
         self.create_widgets()
-        
+    
+    def close_login_menu(self):
+        #compare pass against pass of user selected
+        correct = True
+        if( correct == True):
+            #self.password_entry.delete(0,tk.END)
+            self.login.destroy()
+        #if correct
+        #clear fields
+        #closes login window
+        #unhides root
+    
     def set_dark_theme(self):
         self.bg_color = "#2d2d2d"
         self.text_bg = "#3d3d3d"
@@ -69,11 +83,7 @@ class ChatApp:
         self.messagearea = tk.Frame(self.root, bg=self.bg_color)
         self.messagearea.grid(row=1, column=0, sticky="ew", padx=10, pady=10)
         
-        self.messageinput = ttk.Entry(
-            self.messagearea,
-            font=('Arial', 18),
-            style="Dark.TEntry"
-        )
+        self.messageinput = ttk.Entry( self.messagearea, font=('Arial', 18), style="Dark.TEntry")
         self.messageinput.pack(side=tk.LEFT, expand=True, fill='x', padx=(0, 10))
         self.messageinput.bind("<Return>", lambda event: self.sendmessage())
         
