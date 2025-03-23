@@ -1,4 +1,3 @@
-from contextlib import nullcontext
 import tkinter as tk
 from tkinter import scrolledtext, ttk
 from tkinter import *
@@ -14,7 +13,12 @@ class ChatApp:
         self.login.title("Login Window")
         #self.login.resizable(width = False, height = False) 
         self.login.configure(width = 400, height = 300)
-
+        #create server to connect to
+        self.server_label = tk.Label(self.login, text = "Enter Server IP:")
+        self.server_label.pack()
+        #create field to input server
+        self.server_entry = tk.Entry(self.login)
+        self.server_entry.pack()
         #self.pls = Label(self.login, text = "Please login to continue", justify = CENTER,font = ('Arial',14))
         #create and username laebl
         self.username_label = tk.Label(self.login,text = "Username:")
@@ -70,7 +74,7 @@ class ChatApp:
         self.bg_color = "#2d2d2d"
         self.text_bg = "#3d3d3d"
         self.user_bg = "#404040"
-        self.bot_bg = "#2d2d2d"
+        self.bot_bg = "#2d2d2d" # need to change all bot_bg to chatter_bg
         self.text_fg = "#ffffff"
         self.root.configure(bg=self.bg_color)
 
