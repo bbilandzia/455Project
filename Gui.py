@@ -53,10 +53,14 @@ class ChatApp:
     
     def close_login_menu(self):
         #compare pass against pass of user selected
+        #grab the user and pass from the login text boxes
+        user = self.username_entry.get()
+        passwordstuff = self.password_entry.get()
         correct = True
         if( correct == True):
             #self.password_entry.delete(0,tk.END)
             self.login.destroy()
+            self.root.deiconify()
         #if correct
         #clear fields
         #closes login window
