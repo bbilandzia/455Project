@@ -8,6 +8,7 @@ import ssl
 import pathlib
 import threading
 from queue import Queue
+import hashlib
 
 async def send(websocket, message):
         #print(f"Connected to server. You can now send messages.")
@@ -82,7 +83,9 @@ class ChatApp:
     def close_login_menu(self):
         server_ip = self.server_entry.get() or "localhost"
         username = self.username_entry.get()
-        password = self.password_entry.get()
+        ppassword = self.password_entry.get()
+        encoded_pass = ppassword.encode('utf-8')
+        password = hashlib.sha512(encoded_pass).hexdigest()
         # Correct the thread target and arguments
         threading.Thread(
             target=self.async_connect_and_login,

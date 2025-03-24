@@ -14,8 +14,9 @@ RATE_LIMIT = 30         # messages per minute
 
 # Test users; can create more users by adding to this dictionary
 USERS = {
-    "testuser1" : "password123",
-    "testuser2" : "password456"
+    "testuser1" : "e0cdf1936a158e9f3143b7a60355d2234c16ae6ac3bd82e52af2db540a95e31a7e8cff068661a41724a031b9a59ac1aef8586e71a165603f67d5e6331ecc647e",
+    "testuser2" : "482786354fc7f7618c0876e71ddb816eb365c06ee4a2107ca76a49ebe944562d9410c4f92fbbdeea794c473bc9a63afbdb3bde43dfcbb2ffe15976b0bffe07d1",
+    "testuser3" : "37214356c718d75a0d78fad059a6894a4f5e75910e577a5c1443143187422a2bb117ad5f7f87e80ad05ca00d7397f5df477e0e492899ecd8f39d487abd059eb1"
 }
 
 # Prevent users from spamming chat
