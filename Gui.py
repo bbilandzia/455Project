@@ -8,6 +8,7 @@ import ssl
 import pathlib
 import threading
 from queue import Queue
+import rsa
 
 async def send(websocket, message):
         #print(f"Connected to server. You can now send messages.")
@@ -50,7 +51,7 @@ class ChatApp:
         self.password_label = tk.Label(self.login,text = "Password:")
         self.password_label.pack()
         #create and place the password label and entry
-        self.password_entry = tk.Entry(self.login)
+        self.password_entry = tk.Entry(self.login, show = "*")
         self.password_entry.pack()
         
 

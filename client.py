@@ -50,7 +50,7 @@ class ChatApp:
         self.password_label = tk.Label(self.login,text = "Password:")
         self.password_label.pack()
         #create and place the password label and entry
-        self.password_entry = tk.Entry(self.login)
+        self.password_entry = tk.Entry(self.login, show= "*")
         self.password_entry.pack()
         
 
