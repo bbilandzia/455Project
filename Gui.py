@@ -1,8 +1,28 @@
 import tkinter as tk
 from tkinter import scrolledtext, ttk
 from tkinter import *
+import asyncio
+from typing import Concatenate
+import websockets
+import ssl
+import pathlib
+import threading
+from queue import Queue
+
+async def send(websocket, message):
+        #print(f"Connected to server. You can now send messages.")
+        #print(f"\tType /quit to leave the chat.")
+        if message == "/quit":
+            await websocket.close()
+        await websocket.send(message)
+
 class ChatApp:
     def __init__(self, root):
+        # SSL configuration
+        self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        self.localhostpem = pathlib.Path(__file__).with_name("localhost.pem")
+        self.ssl_context.load_verify_locations(self.localhostpem)
+
         self.root = root
 
 
@@ -36,9 +56,13 @@ class ChatApp:
 
         self.loginbutton = tk.Button(self.login, text = "ATTEMPT", font = ('Arial', 14), command = self.close_login_menu)
         self.loginbutton.pack()
+        self.loginbutton.bind("<Return>", lambda event: self.close_login_menu)
 
-
-
+        self.websocket = None
+        self.username = None
+        self.message_queue = Queue()
+        self.receive_task = None
+        self.root.after(100,self.check_messages)
 
 
 
@@ -56,25 +80,60 @@ class ChatApp:
         self.create_widgets()
     
     def close_login_menu(self):
-        #compare pass against pass of user selected
-        #grab the user and pass from the login text boxes
-        user = self.username_entry.get()
-        passwordstuff = self.password_entry.get()
-        correct = True
-        if( correct == True):
-            #self.password_entry.delete(0,tk.END)
-            self.login.destroy()
-            self.root.deiconify()
-        #if correct
-        #clear fields
-        #closes login window
-        #unhides root
-    
+        server_ip = self.server_entry.get() or "localhost"
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        # Correct the thread target and arguments
+        threading.Thread(
+            target=self.async_connect_and_login,
+            args=(server_ip, username, password),
+            daemon=True
+        ).start()
+    def async_connect_and_login(self, server_ip, username, password):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        self.loop = loop
+        try:
+            self.websocket = loop.run_until_complete(self.connect_to_server(server_ip, username, password))
+            
+            if self.websocket:
+                self.receive_task = asyncio.ensure_future(self.receive_messages())# need to figure out what the function is to receive messages
+                loop.run_until_complete(self.receive_task)
+        #except Exception as e:
+            #self.message_queue.put(("error", f"Connection error: {str(e)}"))
+        finally:
+            loop.close()     
+
+
+
+    async def connect_to_server(self, server_ip, username, password):
+        server_address = f"wss://{server_ip}:8765"
+        try:
+            websocket = await websockets.connect( server_address, ssl=self.ssl_context )
+            await websocket.send(f"{username}\n{password}")
+            result = await websocket.recv()
+            
+            if result == "Authentication successful!":
+                self.message_queue.put(("login_success", username))
+                return websocket
+                #self.login.destroy()
+                #self.root.reiconify()
+            else:
+                self.message_queue.put(("error", "Login failed"))
+                return None
+                
+        except Exception as e:
+            #self.message_queue.put(("error", f"Connection error: {str(e)}"))
+            return None 
+
+
+
+
     def set_dark_theme(self):
         self.bg_color = "#2d2d2d"
         self.text_bg = "#3d3d3d"
         self.user_bg = "#404040"
-        self.bot_bg = "#2d2d2d" # need to change all bot_bg to chatter_bg
+        self.chatter_bg = "#2d2d2d" # need to change all chatter_bg to chatter_bg
         self.text_fg = "#ffffff"
         self.root.configure(bg=self.bg_color)
 
@@ -107,35 +166,67 @@ class ChatApp:
         
         self.style.configure("Dark.TButton", background="#4d4d4d", foreground=self.text_fg, bordercolor="#4d4d4d", focusthickness=3, focuscolor="#4d4d4d")
         self.style.map("Dark.TButton", background=[('active', '#5d5d5d')], foreground=[('active', self.text_fg)])
-        
+    
+                
     def sendmessage(self):
         usermessage = self.messageinput.get()
         if not usermessage.strip():
             return
         
-        self.showmessage(usermessage, "user") # probably change to send asyncio stuff and names should be passed by the server
+        #self.showmessage(usermessage, "user") # probably change to send asyncio stuff and names should be passed by the server
+        #websocket stuff
+        #if self.websocket and not self.websocket.closed:
+        #if self.websocket:
+            #asyncio.run_coroutine_threadsafe( self.websocket.send(usermessage), asyncio.get_event_loop())
+        #send here
+        if self.websocket:
+            asyncio.run_coroutine_threadsafe(send(self.websocket,usermessage),self.loop)
+
+        #send(self.websocket,usermessage)
         self.messageinput.delete(0, tk.END) # clear field after sending the message
         
         # Simulate bot response after a short delay
-        self.root.after(1000, self.generate_bot_response, usermessage)# this is just for testing 
-        
-    def generate_bot_response(self, messageinput):
+        #self.root.after(1000, self.generate_bot_response, usermessage)# this is just for testing 
+    #able to send messages
+
+    async def receive_messages(self):
+        try:
+            while True:
+                message = await self.websocket.recv()
+                self.message_queue.put(("message", message))
         # Simulated response - replace with actual API call
-        bot_response = f"Bot: I received your message - {messageinput[::-1]}"
-        self.showmessage(bot_response, "bot") # again person should be passed in by the server
-        
+        #bot_response = f"Bot: I received your message - {messageinput[::-1]}"
+        #self.showmessage(bot_response, "bot") # again person should be passed in by the server
+        except Exception as e:
+            #self.message_queue.put(("error", f"Connection error: {str(e)}"))
+            return None         
     def showmessage(self, message, sender):
         self.historyscroll.config(state='normal')
         
         tag_name = f"{sender}_tag"
-        self.historyscroll.tag_configure(tag_name, background=self.user_bg if sender == "user" else self.bot_bg, foreground=self.text_fg, lmargin1=20, lmargin2=20, rmargin=20, spacing3=10, wrap=tk.WORD)
+        
+        self.historyscroll.tag_configure(tag_name, background=self.user_bg if sender == "user" else self.chatter_bg, foreground=self.text_fg, lmargin1=20, lmargin2=20, rmargin=20, spacing3=10, wrap=tk.WORD)
         
         self.historyscroll.insert(tk.END, "\n" + message + "\n", tag_name)
         self.historyscroll.config(state='disabled')
         
         # Auto-scroll to bottom
         self.historyscroll.see(tk.END)
-
+    def check_messages(self):
+        while not self.message_queue.empty():
+            item = self.message_queue.get()
+            if isinstance(item, tuple) and len(item) == 2:
+                msg_type, content = item
+                if msg_type == "login_success":  # Corrected message type
+                    self.login.destroy()
+                    self.root.deiconify()
+                    self.username = content
+                    self.showmessage(f"Logged in as {self.username}", "system")
+                elif msg_type == "message":
+                    self.showmessage(content, "other")
+                elif msg_type == "error":
+                    self.showmessage(content, "error")
+        self.root.after(100, self.check_messages)
 if __name__ == "__main__":
     root = tk.Tk()
     app = ChatApp(root)

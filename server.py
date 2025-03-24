@@ -73,7 +73,8 @@ async def hello(websocket):
 
             chat_msg = f"{username}: {message}"
             await server_broadcast(chat_msg)
-            await websocket.send(chat_msg)
+            # this was creating 2 messages on client sending messages
+            #await websocket.send(chat_msg)
     # error handling
     except Exception as e:
         print(f"Error: {e}")
