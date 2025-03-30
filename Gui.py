@@ -55,10 +55,16 @@ class ChatApp:
         self.password_entry.pack()
         
 
-        self.loginbutton = tk.Button(self.login, text = "ATTEMPT", font = ('Arial', 14), command = self.close_login_menu)
-        self.loginbutton.pack()
-        self.loginbutton.bind("<Return>", lambda event: self.close_login_menu)
 
+
+        
+
+        self.loginbutton = tk.Button(self.login, text = "ATTEMPT", font = ('Arial', 14), command = self.close_login_menu)
+        self.registerbutton = tk.Button(self.login, text = "Register", font = ('Arial',14), command = self.open_register_window)
+        self.loginbutton.pack()
+        self.registerbutton.pack()
+        self.loginbutton.bind("<Return>", lambda event: self.close_login_menu)
+        
         self.websocket = None
         self.username = None
         self.message_queue = Queue()
@@ -79,7 +85,34 @@ class ChatApp:
         self.root.grid_rowconfigure(0, weight=1)
         
         self.create_widgets()
-    
+    def open_register_window(self):
+        
+        self.register = tk.Toplevel()
+        self.register.title("Please Register")
+        self.register.configure(width = 400, height = 300)
+        self.user_label = tk.Label(self.register, text = "Enter Username")
+        self.user_label.pack()
+        self.user_entry = tk.Entry(self.register)
+        self.user_entry.pack()
+        self.pass_label = tk.Label(self.register,text = "Please enter Desired Pass")
+        self.pass_label.pack()
+        self.pass_entry = tk.Entry(self.register)
+        self.pass_entry.pack()
+        self.confpass_label = tk.Label(self.register, text = "Confirm Password")
+        self.confpass_label.pack()
+        self.confpass_entry = tk.Entry(self.register)
+        self.confpass_entry.pack()
+        self.registerregisterbutton = tk.Button(self.register,text = "Register", font = ('Arial',14),command = self.register_now())
+        self.registerregisterbutton.pack()
+    def register_now(self):
+        user = self.user_entry.get()
+        passw = self.pass_entry.get()
+        confpassw = self.confpass_entry.get()
+        if(passw != confpassw):
+            self.register.title("passwords don't match")
+        else:
+            return
+        
     def close_login_menu(self):
         server_ip = self.server_entry.get() or "localhost"
         username = self.username_entry.get()
